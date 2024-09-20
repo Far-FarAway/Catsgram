@@ -1,0 +1,16 @@
+package ru.yandex.practicum.catsgram.model;
+
+import java.time.Instant;
+
+import lombok.*;
+
+@Data
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(of = {"id"})
+public class Post {
+    Long id;
+    Long authorId;
+    String description;
+    Instant postDate;
+}
