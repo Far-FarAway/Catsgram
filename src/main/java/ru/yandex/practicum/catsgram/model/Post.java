@@ -2,15 +2,25 @@ package ru.yandex.practicum.catsgram.model;
 
 import java.time.Instant;
 
-import lombok.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import ru.yandex.practicum.catsgram.marker.onCreate;
 
 @Data
-@AllArgsConstructor
-@Builder
 @EqualsAndHashCode(of = {"id"})
 public class Post {
+    @PositiveOrZero
     Long id;
+    @PositiveOrZero
     Long authorId;
+    @NotNull(groups = {onCreate.class})
+    @NotBlank(groups = {onCreate.class})
     String description;
+    @FutureOrPresent
     Instant postDate;
 }
