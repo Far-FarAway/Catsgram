@@ -6,11 +6,13 @@ import ru.yandex.practicum.catsgram.controller.ControllerUtility;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
+import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -23,6 +25,10 @@ public class PostService {
     public Post create( Post post) {
         if(post.getDescription() == null || post.getDescription().isBlank()) {
             throw new ConditionsNotMetException("Описание не может быть пустым");
+        }
+
+        if (isExist(post.getAuthorId())) {
+            throw new ConditionsNotMetException("Пользователь с id " + post.getAuthorId() + " не найден");
         }
 
         post.setId(ControllerUtility.getNextId(posts.keySet()));
@@ -48,5 +54,10 @@ public class PostService {
         throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
     }
 
+    private boolean isExist(long value) {
+        Optional<Post> id = posts.values().stream()
+                .filter(post -> post.getAuthorId() == value).findAny();
 
+        return id.isPresent();
+    }
 }
