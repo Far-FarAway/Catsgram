@@ -97,4 +97,10 @@ public class UserService {
                 .orElse(0);
         return ++currentMaxId;
     }
+
+    public Optional<User> getUserById(long id) {
+        return users.values().stream()
+                .filter(person -> person.getId() == id)
+                .findAny();
+    }
 }
