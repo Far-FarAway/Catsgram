@@ -2,16 +2,13 @@ package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.catsgram.controller.ControllerUtility;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -25,7 +22,7 @@ public class UserService {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new ConditionsNotMetException("Имейл должен быть указан");
         } else {
-            if (ControllerUtility.isDuplicate(users, user.getEmail())) {
+            if (isDuplicate(user.getEmail())) {
                 throw new DuplicatedDataException("Этот имейл уже используется");
             }
         }
@@ -33,7 +30,7 @@ public class UserService {
         if (user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ConditionsNotMetException("Имя не должно быть пустым");
         } else {
-            if(ControllerUtility.isDuplicate(users, user.getUsername())) {
+            if(isDuplicate(user.getUsername())) {
                 throw new DuplicatedDataException("Это имя уже занято");
             }
         }
@@ -42,7 +39,7 @@ public class UserService {
             throw new ConditionsNotMetException("Пароль не должен быть пустой");
         }
 
-        user.setId(ControllerUtility.getNextId(users.keySet()));
+        user.setId(getNextId());
         user.setRegistrationDate(Instant.now());
         users.put(user.getId(), user);
 
@@ -57,14 +54,14 @@ public class UserService {
         if (users.containsKey(user.getId())) {
             User oldUser = users.get(user.getId());
             if (user.getEmail() != null && !(user.getEmail().isBlank())) {
-                if (ControllerUtility.isDuplicate(users, user.getEmail())) {
+                if (isDuplicate(user.getEmail())) {
                     throw new DuplicatedDataException("Этот имейл уже используется");
                 }
                 oldUser.setEmail(user.getEmail());
             }
 
             if (user.getUsername() != null && !(user.getUsername().isBlank())) {
-                if (ControllerUtility.isDuplicate(users, user.getUsername())) {
+                if (isDuplicate(user.getUsername())) {
                     throw new DuplicatedDataException("Это имя уже используется");
                 }
                 oldUser.setUsername(user.getUsername());
@@ -78,5 +75,26 @@ public class UserService {
         }
 
         throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден");
+    }
+
+    private boolean isDuplicate(String value) {
+        Optional<User> duplicate = users.values().stream()
+                .filter(person -> {
+                    if(value.contains("@")) {
+                        return person.getEmail().equals(value);
+                    } else {
+                        return person.getUsername().equals((value));
+                    }
+                }).findAny();
+
+        return duplicate.isPresent();
+    }
+
+    private long getNextId() {
+        long currentMaxId = users.keySet().stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 }

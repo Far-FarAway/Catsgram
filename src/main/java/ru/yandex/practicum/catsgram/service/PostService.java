@@ -2,11 +2,9 @@ package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.catsgram.controller.ControllerUtility;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
-import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -31,7 +29,7 @@ public class PostService {
             throw new ConditionsNotMetException("Пользователь с id " + post.getAuthorId() + " не найден");
         }
 
-        post.setId(ControllerUtility.getNextId(posts.keySet()));
+        post.setId(getNextId());
         post.setPostDate(Instant.now());
         posts.put(post.getId(), post);
         return post;
@@ -59,5 +57,13 @@ public class PostService {
                 .filter(post -> post.getAuthorId() == value).findAny();
 
         return id.isPresent();
+    }
+
+    private long getNextId() {
+        long currentMaxId = posts.keySet().stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 }
