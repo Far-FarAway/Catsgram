@@ -1,13 +1,23 @@
 package ru.yandex.practicum.catsgram.model;
 
 import lombok.*;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+
+import ru.yandex.practicum.catsgram.marker.onCreate;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 public class Image {
+    @PositiveOrZero
     Long id;
+    @PositiveOrZero
     Long postId;
+    @NotBlank(groups = {onCreate.class})
+    @NotNull(groups = {onCreate.class})
     String originalFileName;
+    @NotBlank(groups = {onCreate.class})
+    @NotNull(groups = {onCreate.class})
     String filePath;
 }
