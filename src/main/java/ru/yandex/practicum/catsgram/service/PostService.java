@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
+import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -15,6 +16,11 @@ import java.util.Optional;
 @Service
 public class PostService {
     private final Map<Long, Post> posts = new HashMap<>();
+    UserService userService;
+
+    public PostService(UserService service) {
+        userService = service;
+    }
 
     public Collection<Post> findAll() {
         return posts.values();
@@ -25,7 +31,7 @@ public class PostService {
             throw new ConditionsNotMetException("Описание не может быть пустым");
         }
 
-        if (isExist(post.getAuthorId())) {
+        if (userService.getUserById(post.getAuthorId()).isEmpty()) {
             throw new ConditionsNotMetException("Пользователь с id " + post.getAuthorId() + " не найден");
         }
 
@@ -50,13 +56,6 @@ public class PostService {
         }
 
         throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
-    }
-
-    private boolean isExist(long value) {
-        Optional<Post> id = posts.values().stream()
-                .filter(post -> post.getAuthorId() == value).findAny();
-
-        return id.isPresent();
     }
 
     private long getNextId() {
