@@ -38,6 +38,7 @@ public class PostService {
 
         post.setId(getNextPostId());
         post.setPostDate(Instant.now());
+        post.setComments(new HashMap<>());
         posts.put(post.getId(), post);
         return post;
     }
@@ -68,11 +69,11 @@ public class PostService {
     }
 
     private long getNextCommentId(Map<Long, Comment> comments) {
-        long currentMaxId = comments.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+            long currentMaxId = comments.keySet().stream()
+                    .mapToLong(id -> id)
+                    .max()
+                    .orElse(0);
+            return ++currentMaxId;
     }
 
     public Optional<Post> getPostById(long id) {
@@ -93,7 +94,7 @@ public class PostService {
     }
 
     public Comment createComment(long postId, Comment comment) {
-        Map<Long, Comment> comments =  posts.get(postId).getComments();
+        Map<Long, Comment> comments = posts.get(postId).getComments();
 
         comment.setId(getNextCommentId(comments));
         comment.setPostId(postId);
