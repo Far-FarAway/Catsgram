@@ -7,15 +7,27 @@ import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.Comment;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
+    Comparator comparator = new Comparator() {
+        @Override
+        public int compare(Object post1, Object post2) {
+            LocalDate date1 = ((Post)post1).getPostDate();
+            LocalDate date2 = ((Post)post2).getPostDate();
+            if (date1.isAfter(date2)) {
+                return 3;
+            } else if (date1.isBefore(date2)) {
+                return -3;
+            } else {
+                return 0;
+            }
+        }
+    };
+
     private final Map<Long, Post> posts = new HashMap<>();
     UserService userService;
 
@@ -23,8 +35,23 @@ public class PostService {
         userService = service;
     }
 
-    public Collection<Post> findAll() {
-        return posts.values();
+    public Collection<Post> findAll(Optional<Integer> size, Optional<Integer> from, String sort) {
+        List<Post> postsList = new ArrayList<>(posts.values());
+        postsList.sort(comparator);
+
+        if (SortOrder.from(sort) == SortOrder.DESCENDING) {
+            Collections.reverse(postsList);
+        }
+
+        if (size.isPresent() && from.isEmpty()) {
+            return postsList.stream().limit(size.get()).toList();
+        } else if (size.isEmpty() && from.isPresent()) {
+            return  postsList.stream().skip(from.get()).toList();
+        } else if (size.isPresent())
+            return postsList.stream().skip(from.get()).limit(size.get()).toList();
+        else {
+            return postsList;
+        }
     }
 
     public Post create(Post post) {
@@ -37,7 +64,7 @@ public class PostService {
         }
 
         post.setId(getNextPostId());
-        post.setPostDate(Instant.now());
+        post.setPostDate(LocalDate.now());
         post.setComments(new HashMap<>());
         posts.put(post.getId(), post);
         return post;
