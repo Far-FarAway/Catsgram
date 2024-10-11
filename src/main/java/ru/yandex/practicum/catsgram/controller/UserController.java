@@ -9,6 +9,7 @@ import ru.yandex.practicum.catsgram.marker.onCreate;
 import ru.yandex.practicum.catsgram.service.UserService;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -22,6 +23,11 @@ public class UserController {
     @GetMapping
     public Collection<User> getUsers() {
         return userService.getUsers();
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable long id) {
+        return userService.getUserById(id).orElse(null);
     }
 
     @PostMapping
