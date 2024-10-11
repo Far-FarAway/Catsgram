@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
-import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -64,5 +63,11 @@ public class PostService {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    public Optional<Post> getPostById(long id) {
+        return posts.values().stream()
+                .filter(post -> post.getId() == id)
+                .findAny();
     }
 }
