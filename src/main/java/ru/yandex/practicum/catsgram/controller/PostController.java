@@ -42,12 +42,12 @@ public class PostController {
     }
 
     @PostMapping
+    @Validated(onCreate.class)
     public Post create(@Valid @RequestBody Post post) {
         return postService.create(post);
     }
 
     @PutMapping
-    @Validated(onCreate.class)
     public Post update(@Valid @RequestBody Post newPost) {
         return postService.update(newPost);
     }

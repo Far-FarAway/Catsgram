@@ -31,12 +31,12 @@ public class UserController {
     }
 
     @PostMapping
+    @Validated(onCreate.class)
     public User postUser(@Valid @RequestBody User user) {
         return userService.postUser(user);
     }
 
     @PutMapping
-    @Validated(onCreate.class)
     public User putUser(@Valid @RequestBody User user) {
         return userService.putUser(user);
     }
