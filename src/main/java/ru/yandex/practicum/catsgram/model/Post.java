@@ -25,5 +25,5 @@ public class Post {
     String description;
     @FutureOrPresent
     Instant postDate;
-    Map<Integer, Comment> comments;
+    Map<Long, Comment> comments;
 }
