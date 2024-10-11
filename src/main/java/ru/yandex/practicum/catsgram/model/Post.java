@@ -1,6 +1,5 @@
 package ru.yandex.practicum.catsgram.model;
 
-import java.time.Instant;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 import ru.yandex.practicum.catsgram.marker.onCreate;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Data
@@ -24,6 +24,6 @@ public class Post {
     @NotBlank(groups = {onCreate.class})
     String description;
     @FutureOrPresent
-    Instant postDate;
+    LocalDate postDate;
     Map<Long, Comment> comments;
 }
