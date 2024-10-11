@@ -2,13 +2,17 @@ package ru.yandex.practicum.catsgram.controller;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.validation.Valid;
 
 import ru.yandex.practicum.catsgram.model.Post;
+import ru.yandex.practicum.catsgram.model.Comment;
 import ru.yandex.practicum.catsgram.marker.onCreate;
 import ru.yandex.practicum.catsgram.service.PostService;
 
 import java.util.Collection;
+import java.util.Optional;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/posts")
@@ -28,6 +32,13 @@ public class PostController {
     @GetMapping("/{id}")
     public Post getPost(@PathVariable long id) {
         return postService.getPostById(id).orElse(null);
+    }
+
+    @GetMapping("/{postId}/comments")
+    public Collection<Comment> getComments(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Optional<LocalDate> from,
+                                           @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Optional<LocalDate> until,
+                                           @PathVariable long postId) {
+        return postService.getComments(from, until, postId);
     }
 
     @PostMapping
