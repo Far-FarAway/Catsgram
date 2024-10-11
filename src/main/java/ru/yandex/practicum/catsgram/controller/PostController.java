@@ -47,6 +47,11 @@ public class PostController {
         return postService.create(post);
     }
 
+    @PostMapping("/{postId}/comment")
+    public Comment createComment(@PathVariable long postId, @RequestBody Comment comment) {
+        return postService.createComment(postId, comment);
+    }
+
     @PutMapping
     public Post update(@Valid @RequestBody Post newPost) {
         return postService.update(newPost);
