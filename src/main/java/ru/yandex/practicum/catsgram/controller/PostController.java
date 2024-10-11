@@ -3,6 +3,7 @@ package ru.yandex.practicum.catsgram.controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
 import ru.yandex.practicum.catsgram.model.Post;
@@ -45,11 +46,13 @@ public class PostController {
 
     @PostMapping
     @Validated(onCreate.class)
+    @ResponseStatus(HttpStatus.CREATED)
     public Post create(@Valid @RequestBody Post post) {
         return postService.create(post);
     }
 
     @PostMapping("/{postId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
     public Comment createComment(@PathVariable long postId, @RequestBody Comment comment) {
         return postService.createComment(postId, comment);
     }

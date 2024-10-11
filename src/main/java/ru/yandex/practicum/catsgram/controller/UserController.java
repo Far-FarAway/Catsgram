@@ -2,6 +2,7 @@ package ru.yandex.practicum.catsgram.controller;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
 import ru.yandex.practicum.catsgram.model.User;
@@ -32,6 +33,7 @@ public class UserController {
 
     @PostMapping
     @Validated(onCreate.class)
+    @ResponseStatus(HttpStatus.CREATED)
     public User postUser(@Valid @RequestBody User user) {
         return userService.postUser(user);
     }
