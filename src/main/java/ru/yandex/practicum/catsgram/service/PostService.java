@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
+import ru.yandex.practicum.catsgram.model.Comment;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Service
 public class PostService {
@@ -25,7 +27,7 @@ public class PostService {
         return posts.values();
     }
 
-    public Post create( Post post) {
+    public Post create(Post post) {
         if(post.getDescription() == null || post.getDescription().isBlank()) {
             throw new ConditionsNotMetException("Описание не может быть пустым");
         }
@@ -34,7 +36,7 @@ public class PostService {
             throw new ConditionsNotMetException("Пользователь с id " + post.getAuthorId() + " не найден");
         }
 
-        post.setId(getNextId());
+        post.setId(getNextPostId());
         post.setPostDate(Instant.now());
         posts.put(post.getId(), post);
         return post;
@@ -57,8 +59,16 @@ public class PostService {
         throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
     }
 
-    private long getNextId() {
+    private long getNextPostId() {
         long currentMaxId = posts.keySet().stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
+
+    private long getNextCommentId(Post post) {
+        long currentMaxId = post.getComments().keySet().stream()
                 .mapToLong(id -> id)
                 .max()
                 .orElse(0);
@@ -69,5 +79,16 @@ public class PostService {
         return posts.values().stream()
                 .filter(post -> post.getId() == id)
                 .findAny();
+    }
+
+    public Collection<Comment> getComments(Optional<LocalDate> from, Optional<LocalDate> until, long postId) {
+        if(from.isPresent() && until.isPresent()) {
+            return posts.get(postId).getComments().values().stream()
+                    .filter(comment -> (comment.getDate().equals(from.get()) || comment.getDate().isAfter(from.get())) &&
+                            comment.getDate().equals(until.get()) || comment.getDate().isBefore(until.get()))
+                    .toList();
+        } else {
+            return posts.get(postId).getComments().values();
+        }
     }
 }
