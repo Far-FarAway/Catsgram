@@ -11,6 +11,8 @@ import lombok.EqualsAndHashCode;
 
 import ru.yandex.practicum.catsgram.marker.onCreate;
 
+import java.util.Map;
+
 @Data
 @EqualsAndHashCode(of = {"id"})
 public class Post {
@@ -23,4 +25,5 @@ public class Post {
     String description;
     @FutureOrPresent
     Instant postDate;
+    Map<Integer, Comment> comments;
 }
