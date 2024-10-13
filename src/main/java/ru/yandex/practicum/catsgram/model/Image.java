@@ -11,13 +11,13 @@ import ru.yandex.practicum.catsgram.marker.onCreate;
 @EqualsAndHashCode(of = {"id"})
 public class Image {
     @PositiveOrZero
-    Long id;
+    private Long id;
     @PositiveOrZero
-    Long postId;
+    private Long postId;
     @NotBlank(groups = {onCreate.class})
     @NotNull(groups = {onCreate.class})
-    String originalFileName;
+    private String originalFileName;
     @NotBlank(groups = {onCreate.class})
     @NotNull(groups = {onCreate.class})
-    String filePath;
+    private String filePath;
 }

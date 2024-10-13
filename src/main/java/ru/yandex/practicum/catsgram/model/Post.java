@@ -17,13 +17,13 @@ import java.util.Map;
 @EqualsAndHashCode(of = {"id"})
 public class Post {
     @PositiveOrZero
-    Long id;
+    private Long id;
     @PositiveOrZero
-    Long authorId;
+    private Long authorId;
     @NotNull(groups = {onCreate.class})
     @NotBlank(groups = {onCreate.class})
-    String description;
+    private String description;
     @FutureOrPresent
     LocalDate postDate;
-    Map<Long, Comment> comments;
+    private Map<Long, Comment> comments;
 }

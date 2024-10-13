@@ -16,15 +16,15 @@ import ru.yandex.practicum.catsgram.marker.onCreate;
 @EqualsAndHashCode(of = {"email"})
 public class User {
     @PositiveOrZero
-    Long id;
+    private Long id;
     @NotNull(groups = {onCreate.class})
     @NotBlank(groups = {onCreate.class})
-    String username;
+    private String username;
     @Email
-    String email;
+    private String email;
     @NotNull(groups = {onCreate.class})
     @NotBlank(groups = {onCreate.class})
-    String password;
+    private String password;
     @FutureOrPresent
-    Instant registrationDate;
+    private Instant registrationDate;
 }

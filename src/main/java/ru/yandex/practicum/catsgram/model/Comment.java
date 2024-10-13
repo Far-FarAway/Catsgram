@@ -13,14 +13,14 @@ import java.time.LocalDate;
 @Data
 public class Comment {
     @PositiveOrZero
-    long id;
+    private long id;
     @PositiveOrZero
-    long postId;
+    private long postId;
     @NotBlank(groups = {onCreate.class})
     @NotNull(groups = {onCreate.class})
-    String description;
+    private String description;
     @PositiveOrZero
-    long likesCount;
+    private long likesCount;
     @PastOrPresent
-    LocalDate date;
+    private LocalDate date;
 }

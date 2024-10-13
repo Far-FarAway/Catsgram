@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @RequestMapping("/posts")
 public class PostController {
 
-    PostService postService;
+    private PostService postService;
 
     public PostController(PostService service) {
         this.postService = service;

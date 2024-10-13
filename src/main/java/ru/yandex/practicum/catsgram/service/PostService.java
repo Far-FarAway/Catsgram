@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostService {
-    Comparator comparator = new Comparator() {
+    private Comparator comparator = new Comparator() {
         @Override
         public int compare(Object post1, Object post2) {
             LocalDate date1 = ((Post)post1).getPostDate();
@@ -29,7 +29,7 @@ public class PostService {
     };
 
     private final Map<Long, Post> posts = new HashMap<>();
-    UserService userService;
+    private final UserService userService;
 
     public PostService(UserService service) {
         userService = service;

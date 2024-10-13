@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class UserService {
-    Map<Long, User> users = new HashMap<>();
+    private Map<Long, User> users = new HashMap<>();
 
     public Collection<User> getUsers() {
         return users.values();
