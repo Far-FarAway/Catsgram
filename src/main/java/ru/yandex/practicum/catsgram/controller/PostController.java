@@ -6,10 +6,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.Comment;
-import ru.yandex.practicum.catsgram.marker.onCreate;
+import ru.yandex.practicum.catsgram.marker.OnCreate;
 import ru.yandex.practicum.catsgram.service.PostService;
+import ru.yandex.practicum.catsgram.service.SortOrder;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -28,7 +30,19 @@ public class PostController {
     @GetMapping
     public Collection<Post> findAll(@RequestParam Optional<Integer> size,
                                     @RequestParam Optional<Integer> from,
-                                    @RequestParam(defaultValue = "asc")String sort) {
+                                    @RequestParam(defaultValue = "asc") String sort) {
+        if (SortOrder.from(sort) == null) {
+            throw new ParameterNotValidException("Некорректное значение параметра, должно быть ask или desc ", "sort");
+        }
+
+        if (size.orElse(1) < 1) {
+            throw new ParameterNotValidException("Параметр должен быть больше нуля", "size");
+        }
+
+        if (from.orElse(1) < 0) {
+            throw new ParameterNotValidException("Параметр не может быть меньше нуля", "from");
+        }
+
         return postService.findAll(size, from, sort);
     }
 
@@ -38,14 +52,14 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public Collection<Comment> getComments(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Optional<LocalDate> from,
-                                           @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Optional<LocalDate> until,
+    public Collection<Comment> getComments(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> from,
+                                           @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> until,
                                            @PathVariable long postId) {
         return postService.getComments(from, until, postId);
     }
 
     @PostMapping
-    @Validated(onCreate.class)
+    @Validated(OnCreate.class)
     @ResponseStatus(HttpStatus.CREATED)
     public Post create(@Valid @RequestBody Post post) {
         return postService.create(post);

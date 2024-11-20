@@ -30,7 +30,7 @@ public class UserService {
         if (user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ConditionsNotMetException("Имя не должно быть пустым");
         } else {
-            if(isDuplicate(user.getUsername())) {
+            if (isDuplicate(user.getUsername())) {
                 throw new DuplicatedDataException("Это имя уже занято");
             }
         }
@@ -80,7 +80,7 @@ public class UserService {
     private boolean isDuplicate(String value) {
         Optional<User> duplicate = users.values().stream()
                 .filter(person -> {
-                    if(value.contains("@")) {
+                    if (value.contains("@")) {
                         return person.getEmail().equals(value);
                     } else {
                         return person.getUsername().equals((value));

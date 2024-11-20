@@ -10,20 +10,20 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import ru.yandex.practicum.catsgram.marker.onCreate;
+import ru.yandex.practicum.catsgram.marker.OnCreate;
 
 @Data
 @EqualsAndHashCode(of = {"email"})
 public class User {
     @PositiveOrZero
     private Long id;
-    @NotNull(groups = {onCreate.class})
-    @NotBlank(groups = {onCreate.class})
+    @NotNull(groups = {OnCreate.class})
+    @NotBlank(groups = {OnCreate.class})
     private String username;
     @Email
     private String email;
-    @NotNull(groups = {onCreate.class})
-    @NotBlank(groups = {onCreate.class})
+    @NotNull(groups = {OnCreate.class})
+    @NotBlank(groups = {OnCreate.class})
     private String password;
     @FutureOrPresent
     private Instant registrationDate;

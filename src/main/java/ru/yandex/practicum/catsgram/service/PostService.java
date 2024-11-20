@@ -9,15 +9,14 @@ import ru.yandex.practicum.catsgram.model.Comment;
 
 import java.util.*;
 import java.time.LocalDate;
-import java.util.stream.Collectors;
 
 @Service
 public class PostService {
     private Comparator comparator = new Comparator() {
         @Override
         public int compare(Object post1, Object post2) {
-            LocalDate date1 = ((Post)post1).getPostDate();
-            LocalDate date2 = ((Post)post2).getPostDate();
+            LocalDate date1 = ((Post) post1).getPostDate();
+            LocalDate date2 = ((Post) post2).getPostDate();
             if (date1.isAfter(date2)) {
                 return 3;
             } else if (date1.isBefore(date2)) {
@@ -46,7 +45,7 @@ public class PostService {
         if (size.isPresent() && from.isEmpty()) {
             return postsList.stream().limit(size.get()).toList();
         } else if (size.isEmpty() && from.isPresent()) {
-            return  postsList.stream().skip(from.get()).toList();
+            return postsList.stream().skip(from.get()).toList();
         } else if (size.isPresent())
             return postsList.stream().skip(from.get()).limit(size.get()).toList();
         else {
@@ -55,7 +54,7 @@ public class PostService {
     }
 
     public Post create(Post post) {
-        if(post.getDescription() == null || post.getDescription().isBlank()) {
+        if (post.getDescription() == null || post.getDescription().isBlank()) {
             throw new ConditionsNotMetException("Описание не может быть пустым");
         }
 
@@ -70,7 +69,7 @@ public class PostService {
         return post;
     }
 
-    public Post update( Post newPost) {
+    public Post update(Post newPost) {
         if (newPost.getId() == null) {
             throw new ConditionsNotMetException("Id должен быть указан");
         }
@@ -96,11 +95,11 @@ public class PostService {
     }
 
     private long getNextCommentId(Map<Long, Comment> comments) {
-            long currentMaxId = comments.keySet().stream()
-                    .mapToLong(id -> id)
-                    .max()
-                    .orElse(0);
-            return ++currentMaxId;
+        long currentMaxId = comments.keySet().stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 
     public Optional<Post> getPostById(long id) {
@@ -110,7 +109,7 @@ public class PostService {
     }
 
     public Collection<Comment> getComments(Optional<LocalDate> from, Optional<LocalDate> until, long postId) {
-        if(from.isPresent() && until.isPresent()) {
+        if (from.isPresent() && until.isPresent()) {
             return posts.get(postId).getComments().values().stream()
                     .filter(comment -> (comment.getDate().equals(from.get()) || comment.getDate().isAfter(from.get())) &&
                             comment.getDate().equals(until.get()) || comment.getDate().isBefore(until.get()))

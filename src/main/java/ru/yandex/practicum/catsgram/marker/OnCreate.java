@@ -1,4 +1,4 @@
 package ru.yandex.practicum.catsgram.marker;
 
-public @interface onCreate {
+public @interface OnCreate {
 }

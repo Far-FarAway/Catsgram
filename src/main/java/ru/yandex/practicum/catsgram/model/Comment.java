@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.PastOrPresent;
 
-import ru.yandex.practicum.catsgram.marker.onCreate;
+import ru.yandex.practicum.catsgram.marker.OnCreate;
 
 import java.time.LocalDate;
 
@@ -16,8 +16,8 @@ public class Comment {
     private long id;
     @PositiveOrZero
     private long postId;
-    @NotBlank(groups = {onCreate.class})
-    @NotNull(groups = {onCreate.class})
+    @NotBlank(groups = {OnCreate.class})
+    @NotNull(groups = {OnCreate.class})
     private String description;
     @PositiveOrZero
     private long likesCount;

@@ -12,7 +12,6 @@ import ru.yandex.practicum.catsgram.model.ImageData;
 import ru.yandex.practicum.catsgram.model.Post;
 
 import java.io.IOException;
-import java.lang.RuntimeException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

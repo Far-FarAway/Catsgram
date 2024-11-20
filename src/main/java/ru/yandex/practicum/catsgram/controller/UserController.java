@@ -6,11 +6,10 @@ import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
 import ru.yandex.practicum.catsgram.model.User;
-import ru.yandex.practicum.catsgram.marker.onCreate;
+import ru.yandex.practicum.catsgram.marker.OnCreate;
 import ru.yandex.practicum.catsgram.service.UserService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -32,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping
-    @Validated(onCreate.class)
+    @Validated(OnCreate.class)
     @ResponseStatus(HttpStatus.CREATED)
     public User postUser(@Valid @RequestBody User user) {
         return userService.postUser(user);

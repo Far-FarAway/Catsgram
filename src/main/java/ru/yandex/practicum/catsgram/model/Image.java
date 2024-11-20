@@ -5,7 +5,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 
-import ru.yandex.practicum.catsgram.marker.onCreate;
+import ru.yandex.practicum.catsgram.marker.OnCreate;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -14,10 +14,10 @@ public class Image {
     private Long id;
     @PositiveOrZero
     private Long postId;
-    @NotBlank(groups = {onCreate.class})
-    @NotNull(groups = {onCreate.class})
+    @NotBlank(groups = {OnCreate.class})
+    @NotNull(groups = {OnCreate.class})
     private String originalFileName;
-    @NotBlank(groups = {onCreate.class})
-    @NotNull(groups = {onCreate.class})
+    @NotBlank(groups = {OnCreate.class})
+    @NotNull(groups = {OnCreate.class})
     private String filePath;
 }
