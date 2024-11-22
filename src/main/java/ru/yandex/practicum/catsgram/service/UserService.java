@@ -2,20 +2,32 @@ package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.catsgram.dal.UserRepository;
+import ru.yandex.practicum.catsgram.dto.UserDto;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.mapper.UserMapper;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private Map<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
+    private final UserRepository userRepository;
 
-    public Collection<User> getUsers() {
-        return users.values();
+    public UserService(UserRepository rep) {
+        this.userRepository = rep;
+    }
+
+    public Collection<UserDto> getUsers() {
+        return userRepository.finadAll()
+                .stream()
+                .map(UserMapper::mapToUserDto)
+                .collect(Collectors.toList());
     }
 
     public User postUser(User user) {

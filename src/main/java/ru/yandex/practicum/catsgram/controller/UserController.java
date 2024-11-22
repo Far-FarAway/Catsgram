@@ -1,10 +1,12 @@
 package ru.yandex.practicum.catsgram.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
+import ru.yandex.practicum.catsgram.dto.UserDto;
 import ru.yandex.practicum.catsgram.model.User;
 import ru.yandex.practicum.catsgram.marker.OnCreate;
 import ru.yandex.practicum.catsgram.service.UserService;
@@ -12,16 +14,14 @@ import ru.yandex.practicum.catsgram.service.UserService;
 import java.util.Collection;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
 
-    public UserController(UserService service) {
-        userService = service;
-    }
-
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Collection<User> getUsers() {
+    public Collection<UserDto> getUsers() {
         return userService.getUsers();
     }
 
