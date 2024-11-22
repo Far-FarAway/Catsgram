@@ -1,4 +1,4 @@
-FROM amazoncorretto:22-alpine as builder
+FROM amazoncorretto:22-alpine AS builder
 WORKDIR application
 COPY target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
