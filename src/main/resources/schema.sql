@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS users (
+    user_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username VARCHAR(40) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(40) NOT NULL,
+    registration_date TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+    post_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    author_id BIGINT NOT NULL REFERENCES users(user_id),
+    description TEXT,
+    post_date TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS image_storage (
+    image_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    original_name VARCHAR(255),
+    file_path VARCHAR(1024),
+    post_id BIGINT NOT NULL REFERENCES posts(post_id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    comment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    post_id BIGINT NOT NULL REFERENCES posts(post_id),
+    description VARCHAR(5000) NOT NULL,
+    likes_count INT DEFAULT 0,
+    comment_date TIMESTAMP NOT NULL
+);

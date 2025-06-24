@@ -1,12 +1,19 @@
 package ru.yandex.practicum.catsgram.service;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 
+import ru.yandex.practicum.catsgram.dal.ImageRepository;
+import ru.yandex.practicum.catsgram.dal.PostRepository;
+import ru.yandex.practicum.catsgram.dto.ImageDtoResponse;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.ImageFileException;
+import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.mapper.ImageMapper;
 import ru.yandex.practicum.catsgram.model.Image;
 import ru.yandex.practicum.catsgram.model.ImageData;
 import ru.yandex.practicum.catsgram.model.Post;
@@ -16,29 +23,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ImageService {
-    private final PostService postService;
-    private Map<Long, Image> images = new HashMap<>();
-    private final String imageDirectory = "/Users/vadimkatkov/Desktop/IdeaProjects/Catsgram/images";
+    PostRepository postRepository;
+    ImageRepository imageRepository;
+    ImageMapper imageMapper;
+    String imageDirectory = "/Users/vadimkatkov/Desktop/IdeaProjects/Catsgram/images";
 
-    public List<Image> getPostImages(long postId) {
-        return images.values().stream()
-                .filter(image -> image.getPostId() == postId).toList(); //возможно стоит потом заменить на
-        // collect(Collectors.toList())
+    public List<ImageDtoResponse> getPostImages(long postId) {
+        return imageRepository.findByPostId(postId).stream()
+                .map(imageMapper::mapDto)
+                .toList();
     }
 
     public ImageData getImageData(long imageId) {
-        if (!images.containsKey(imageId)) {
-            throw new ConditionsNotMetException("Изображения с id " + imageId + "не найдено");
-        }
-
-        Image image = images.get(imageId);
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new NotFoundException("Изображения с id " + imageId + "не найдено"));
 
         byte[] data = loadFile(image);
 
@@ -61,32 +65,32 @@ public class ImageService {
         }
     }
 
-    public List<Image> saveImages(long postId, List<MultipartFile> files) {
+    public List<ImageDtoResponse> saveImages(long postId, List<MultipartFile> files) {
         return files.stream()
-                .map(file -> saveImage(postId, file)).toList(); //аналогично
+                .map(file -> saveImage(postId, file))
+                .map(imageMapper::mapDto)
+                .toList(); //аналогично
     }
 
     private Image saveImage(long postId, MultipartFile file) {
-        Post post = postService.getPostById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ConditionsNotMetException("Пост с id " + postId + "не найден"));
 
         Path filePath = saveFile(file, post);
 
         Image image = new Image();
-        image.setId(getNextId());
         image.setFilePath(filePath.toString());
-        image.setPostId(postId);
+        image.setPost(post);
         image.setOriginalFileName(file.getOriginalFilename());
 
-        images.put(image.getId(), image);
-        return image;
+        return imageRepository.save(image);
     }
 
     private Path saveFile(MultipartFile file, Post post) {
         try {
             String uniqueFileName = String.format("%d.%s", Instant.now().toEpochMilli(),
                     StringUtils.getFilenameExtension(file.getOriginalFilename()));
-            Path uploadPath = Paths.get(imageDirectory, String.valueOf(post.getAuthorId()), post.getId().toString());
+            Path uploadPath = Paths.get(imageDirectory, String.valueOf(post.getAuthor().getId()), post.getId().toString());
             Path filePath = uploadPath.resolve(uniqueFileName);
 
             if (!Files.exists(uploadPath)) {
@@ -98,13 +102,5 @@ public class ImageService {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    private long getNextId() {
-        long currentId = images.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentId;
     }
 }

@@ -1,29 +1,35 @@
 package ru.yandex.practicum.catsgram.model;
 
 
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
+import lombok.*;
 
-import ru.yandex.practicum.catsgram.marker.OnCreate;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Map;
 
+@Entity
+@Table(name = "posts")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(of = {"id"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Post {
-    @PositiveOrZero
-    private Long id;
-    @PositiveOrZero
-    private Long authorId;
-    @NotNull(groups = {OnCreate.class})
-    @NotBlank(groups = {OnCreate.class})
-    private String description;
-    @FutureOrPresent
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
+    Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    User author;
+    @Column
+    String description;
+    @Column(name = "post_date")
     LocalDate postDate;
-    private Map<Long, Comment> comments;
+    @OneToMany(mappedBy = "post")
+    @MapKey(name = "id")
+    Map<Long, Comment> comments;
 }

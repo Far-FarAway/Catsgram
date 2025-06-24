@@ -2,29 +2,30 @@ package ru.yandex.practicum.catsgram.model;
 
 import java.time.Instant;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
+import lombok.*;
 
-import ru.yandex.practicum.catsgram.marker.OnCreate;
+import lombok.experimental.FieldDefaults;
 
+@Entity
+@Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 @EqualsAndHashCode(of = {"email"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-    @PositiveOrZero
-    private Long id;
-    @NotNull(groups = {OnCreate.class})
-    @NotBlank(groups = {OnCreate.class})
-    private String username;
-    @Email
-    private String email;
-    @NotNull(groups = {OnCreate.class})
-    @NotBlank(groups = {OnCreate.class})
-    private String password;
-    @FutureOrPresent
-    private Instant registrationDate;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    Long id;
+    @Column
+    String username;
+    @Column
+    String email;
+    @Column
+    String password;
+    @Column(name = "registration_date")
+    Instant registrationDate;
 }

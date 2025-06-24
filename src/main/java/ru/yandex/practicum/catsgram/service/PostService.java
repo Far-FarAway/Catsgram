@@ -1,9 +1,21 @@
 package ru.yandex.practicum.catsgram.service;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.catsgram.dal.CommentRepository;
+import ru.yandex.practicum.catsgram.dal.PostRepository;
+import ru.yandex.practicum.catsgram.dal.UserRepository;
+import ru.yandex.practicum.catsgram.dto.CommentDtoRequest;
+import ru.yandex.practicum.catsgram.dto.CommentDtoResponse;
+import ru.yandex.practicum.catsgram.dto.PostDtoRequest;
+import ru.yandex.practicum.catsgram.dto.PostDtoResponse;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.mapper.CommentMapper;
+import ru.yandex.practicum.catsgram.mapper.PostMapper;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.Comment;
 
@@ -11,122 +23,82 @@ import java.util.*;
 import java.time.LocalDate;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService {
-    private Comparator comparator = new Comparator() {
-        @Override
-        public int compare(Object post1, Object post2) {
-            LocalDate date1 = ((Post) post1).getPostDate();
-            LocalDate date2 = ((Post) post2).getPostDate();
-            if (date1.isAfter(date2)) {
-                return 3;
-            } else if (date1.isBefore(date2)) {
-                return -3;
-            } else {
-                return 0;
-            }
-        }
-    };
+    PostRepository postRepository;
+    UserService userService;
+    UserRepository userRepository;
+    CommentRepository commentRepository;
+    PostMapper postMapper;
+    CommentMapper commentMapper;
 
-    private final Map<Long, Post> posts = new HashMap<>();
-    private final UserService userService;
-
-    public PostService(UserService service) {
-        userService = service;
-    }
-
-    public Collection<Post> findAll(Optional<Integer> size, Optional<Integer> from, String sort) {
-        List<Post> postsList = new ArrayList<>(posts.values());
-        postsList.sort(comparator);
-
-        if (SortOrder.from(sort) == SortOrder.DESCENDING) {
-            Collections.reverse(postsList);
-        }
-
-        if (size.isPresent() && from.isEmpty()) {
-            return postsList.stream().limit(size.get()).toList();
-        } else if (size.isEmpty() && from.isPresent()) {
-            return postsList.stream().skip(from.get()).toList();
-        } else if (size.isPresent())
-            return postsList.stream().skip(from.get()).limit(size.get()).toList();
-        else {
-            return postsList;
+    public Collection<PostDtoResponse> findAll(Integer size, Integer from, String sort) {
+        SortOrder order = SortOrder.from(sort);
+        if (order == SortOrder.DESCENDING) {
+            return postRepository.findAllByFiltersAndOrderDesc(size, from).stream()
+                    .map(postMapper::mapDto)
+                    .toList();
+        } else if (order == SortOrder.ASCENDING) {
+            return postRepository.findAllByFiltersAndOrderAsc(size, from).stream()
+                    .map(postMapper::mapDto)
+                    .toList();
+        } else {
+            throw new ConditionsNotMetException("Метод сортировки указан неверно: " + sort);
         }
     }
 
-    public Post create(Post post) {
-        if (post.getDescription() == null || post.getDescription().isBlank()) {
-            throw new ConditionsNotMetException("Описание не может быть пустым");
-        }
+    public PostDtoResponse create(PostDtoRequest dto) {
+        userRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + dto.getAuthorId()));
 
-        if (userService.getUserById(post.getAuthorId()).isEmpty()) {
-            throw new ConditionsNotMetException("Пользователь с id " + post.getAuthorId() + " не найден");
-        }
+        Post post = postMapper.mapPojo(dto);
 
-        post.setId(getNextPostId());
         post.setPostDate(LocalDate.now());
         post.setComments(new HashMap<>());
-        posts.put(post.getId(), post);
-        return post;
+        return postMapper.mapDto(postRepository.save(post));
     }
 
-    public Post update(Post newPost) {
+    public PostDtoResponse update(PostDtoRequest newPost) {
         if (newPost.getId() == null) {
             throw new ConditionsNotMetException("Id должен быть указан");
         }
 
-        if (posts.containsKey(newPost.getId())) {
-            Post oldPost = posts.get(newPost.getId());
-            if (newPost.getDescription() != null && !newPost.getDescription().isBlank()) {
-                oldPost.setDescription(newPost.getDescription());
-            }
-
-            return oldPost;
+        Post oldPost = postRepository.findById(newPost.getId())
+                .orElseThrow(() -> new NotFoundException("Пост с id " + newPost.getId() + " не найден"));
+        if (newPost.getDescription() != null && !newPost.getDescription().isBlank()) {
+            oldPost.setDescription(newPost.getDescription());
         }
 
-        throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
+        return postMapper.mapDto(oldPost);
     }
 
-    private long getNextPostId() {
-        long currentMaxId = posts.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    public PostDtoResponse getPostById(long id) {
+        return postMapper.mapDto(postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пост с id = " + id + " не найден")));
     }
 
-    private long getNextCommentId(Map<Long, Comment> comments) {
-        long currentMaxId = comments.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
-    public Optional<Post> getPostById(long id) {
-        return posts.values().stream()
-                .filter(post -> post.getId() == id)
-                .findAny();
-    }
-
-    public Collection<Comment> getComments(Optional<LocalDate> from, Optional<LocalDate> until, long postId) {
-        if (from.isPresent() && until.isPresent()) {
-            return posts.get(postId).getComments().values().stream()
-                    .filter(comment -> (comment.getDate().equals(from.get()) || comment.getDate().isAfter(from.get())) &&
-                            comment.getDate().equals(until.get()) || comment.getDate().isBefore(until.get()))
-                    .toList();
+    public Collection<Comment> getComments(LocalDate from, LocalDate until, long postId) {
+        if (from == null && until != null) {
+            return commentRepository.findAllByFilterUntil(until);
+        } else if (from != null && until == null) {
+            return commentRepository.findAllByFilterFrom(from);
+        } else if (from != null) {
+            return commentRepository.findAllByFilters(from, until);
         } else {
-            return posts.get(postId).getComments().values();
+            return commentRepository.findAll();
         }
     }
 
-    public Comment createComment(long postId, Comment comment) {
-        Map<Long, Comment> comments = posts.get(postId).getComments();
+    public CommentDtoResponse createComment(long postId, CommentDtoRequest dto) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Пост с id = " + postId + " не найден"));
 
-        comment.setId(getNextCommentId(comments));
-        comment.setPostId(postId);
+        Comment comment = commentMapper.mapPojo(dto);
+
+        comment.setPost(post);
         comment.setDate(LocalDate.now());
 
-        comments.put(comment.getId(), comment);
-        return comment;
+        return commentMapper.mapDto(commentRepository.save(comment));
     }
 }

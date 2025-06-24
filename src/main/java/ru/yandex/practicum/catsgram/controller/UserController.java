@@ -1,23 +1,27 @@
 package ru.yandex.practicum.catsgram.controller;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
-import jakarta.validation.Valid;
 
+import ru.yandex.practicum.catsgram.dto.NewUserRequest;
+import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
 import ru.yandex.practicum.catsgram.dto.UserDto;
-import ru.yandex.practicum.catsgram.model.User;
+import ru.yandex.practicum.catsgram.marker.OnUpdate;
 import ru.yandex.practicum.catsgram.marker.OnCreate;
 import ru.yandex.practicum.catsgram.service.UserService;
 
 import java.util.Collection;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/users")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    private UserService userService;
+    UserService userService;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
@@ -26,19 +30,20 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable long id) {
-        return userService.getUserById(id).orElse(null);
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUser(@PathVariable long userId) {
+        return userService.getUserById(userId);
     }
 
     @PostMapping
-    @Validated(OnCreate.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public User postUser(@Valid @RequestBody User user) {
-        return userService.postUser(user);
+    public UserDto postUser(@Validated(OnCreate.class) @RequestBody NewUserRequest userRequest) {
+        return userService.postUser(userRequest);
     }
 
-    @PutMapping
-    public User putUser(@Valid @RequestBody User user) {
-        return userService.putUser(user);
+    @PutMapping("/{userId}")
+    public UserDto putUser(@PathVariable long userId,
+                           @Validated(OnUpdate.class) @RequestBody UpdateUserRequest request) {
+        return userService.putUser(userId, request);
     }
 }

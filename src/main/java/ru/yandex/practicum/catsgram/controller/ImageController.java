@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import lombok.RequiredArgsConstructor;
 
-import ru.yandex.practicum.catsgram.model.Image;
+import ru.yandex.practicum.catsgram.dto.ImageDtoResponse;
 import ru.yandex.practicum.catsgram.model.ImageData;
 import ru.yandex.practicum.catsgram.service.ImageService;
 
@@ -22,7 +22,7 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping("/posts/{postId}/images")
-    public List<Image> getPostImages(@PathVariable long postId) {
+    public List<ImageDtoResponse> getPostImages(@PathVariable long postId) {
         return imageService.getPostImages(postId);
     }
 
@@ -39,8 +39,8 @@ public class ImageController {
 
     @PostMapping("/posts/{postId}/images")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<Image> addPostImage(@PathVariable long postId,
-                                    @RequestParam List<MultipartFile> images) {
+    public List<ImageDtoResponse> addPostImage(@PathVariable long postId,
+                                               @RequestParam List<MultipartFile> images) {
         return imageService.saveImages(postId, images);
     }
 }

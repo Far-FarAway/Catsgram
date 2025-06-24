@@ -1,23 +1,28 @@
 package ru.yandex.practicum.catsgram.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
 
-import ru.yandex.practicum.catsgram.marker.OnCreate;
+import lombok.experimental.FieldDefaults;
 
+@Entity
+@Table(name = "image_storage")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(of = {"id"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Image {
-    @PositiveOrZero
-    private Long id;
-    @PositiveOrZero
-    private Long postId;
-    @NotBlank(groups = {OnCreate.class})
-    @NotNull(groups = {OnCreate.class})
-    private String originalFileName;
-    @NotBlank(groups = {OnCreate.class})
-    @NotNull(groups = {OnCreate.class})
-    private String filePath;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
+    Long id;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    Post post;
+    @Column(name = "original_name")
+    String originalFileName;
+    @Column(name = "file_path")
+    String filePath;
 }

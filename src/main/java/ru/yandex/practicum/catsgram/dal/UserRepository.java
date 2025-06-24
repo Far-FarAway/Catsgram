@@ -1,21 +1,14 @@
 package ru.yandex.practicum.catsgram.dal;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.catsgram.dal.mappers.UserRowMapper;
 import ru.yandex.practicum.catsgram.model.User;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
-public class UserRepository {
-    private final JdbcTemplate jdbc;
-    private final UserRowMapper mapper;
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
 
-    public List<User> finadAll() {
-        String query = "SELECT * FROM users";
-        return jdbc.query(query, mapper);
-    }
+    Optional<User> findById(long userId);
 }

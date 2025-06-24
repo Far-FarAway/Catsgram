@@ -1,26 +1,31 @@
 package ru.yandex.practicum.catsgram.model;
 
-import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.persistence.*;
+import lombok.*;
 
-import ru.yandex.practicum.catsgram.marker.OnCreate;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "comments")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
-    @PositiveOrZero
-    private long id;
-    @PositiveOrZero
-    private long postId;
-    @NotBlank(groups = {OnCreate.class})
-    @NotNull(groups = {OnCreate.class})
-    private String description;
-    @PositiveOrZero
-    private long likesCount;
-    @PastOrPresent
-    private LocalDate date;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
+    Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    Post post;
+    @Column
+    String description;
+    @Column(name = "likes_count")
+    long likesCount;
+    @Column(name = "comment_date")
+    LocalDate date;
 }
