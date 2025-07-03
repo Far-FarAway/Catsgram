@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final Map<Long, User> users = new HashMap<>();
     private final UserRepository userRepository;
 
     public UserService(UserRepository rep) {
@@ -63,29 +62,8 @@ public class UserService {
     }
 
     private boolean isDuplicate(String value) {
-        Optional<User> duplicate = users.values().stream()
-                .filter(person -> {
-                    if (value.contains("@")) {
-                        return person.getEmail().equals(value);
-                    } else {
-                        return person.getUsername().equals((value));
-                    }
-                }).findAny();
+        Optional<User> duplicate = userRepository.findDuplicate(value);
 
         return duplicate.isPresent();
     }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
-    /*public Optional<User> getUserById(long id) {
-        return users.values().stream()
-                .filter(person -> person.getId() == id)
-                .findAny();
-    }*/
 }
