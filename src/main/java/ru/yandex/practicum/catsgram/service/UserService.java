@@ -3,9 +3,8 @@ package ru.yandex.practicum.catsgram.service;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.catsgram.dal.UserRepository;
-import ru.yandex.practicum.catsgram.dto.NewUserRequest;
-import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
-import ru.yandex.practicum.catsgram.dto.UserDto;
+import ru.yandex.practicum.catsgram.dto.UserDtoRequest;
+import ru.yandex.practicum.catsgram.dto.UserDtoResponse;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
@@ -23,14 +22,14 @@ public class UserService {
         this.userRepository = rep;
     }
 
-    public Collection<UserDto> getUsers() {
+    public Collection<UserDtoResponse> getUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(UserMapper::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
-    public UserDto postUser(NewUserRequest request) {
+    public UserDtoResponse postUser(UserDtoRequest request) {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
             throw new ConditionsNotMetException("Имейл должен быть указан");
         } else {
@@ -47,7 +46,7 @@ public class UserService {
         return UserMapper.mapToUserDto(user);
     }
 
-    public UserDto putUser(long userId, UpdateUserRequest request) {
+    public UserDtoResponse putUser(long userId, UserDtoRequest request) {
         User updatedUser = userRepository.findById(userId)
                 .map(user -> UserMapper.updateUserFields(user, request))
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
@@ -55,7 +54,7 @@ public class UserService {
         return UserMapper.mapToUserDto(updatedUser);
     }
 
-    public UserDto getUserById(long userId) {
+    public UserDtoResponse getUserById(long userId) {
         return userRepository.findById(userId)
                 .map(UserMapper::mapToUserDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));

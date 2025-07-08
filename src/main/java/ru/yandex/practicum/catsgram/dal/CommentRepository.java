@@ -19,4 +19,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT comm FROM Comment comm " +
             "WHERE comm.date <= ?1")
     List<Comment> findAllByFilterUntil(LocalDate until);
+
+    List<Comment> findByPostId(Long id);
 }

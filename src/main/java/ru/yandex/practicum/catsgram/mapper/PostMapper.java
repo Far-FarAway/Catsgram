@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.catsgram.dal.CommentRepository;
 import ru.yandex.practicum.catsgram.dal.UserRepository;
 import ru.yandex.practicum.catsgram.dto.PostDtoRequest;
 import ru.yandex.practicum.catsgram.dto.PostDtoResponse;
@@ -11,11 +12,14 @@ import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
 
+import java.time.LocalDate;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostMapper {
     UserRepository userRepository;
+    CommentRepository commentRepository;
 
     public Post mapPojo(PostDtoRequest dto) {
         User user = userRepository.findById(dto.getAuthorId())
@@ -25,8 +29,7 @@ public class PostMapper {
                 .id(dto.getId())
                 .author(user)
                 .description(dto.getDescription())
-                .postDate(dto.getPostDate())
-                .comments(dto.getComments())
+                .postDate(LocalDate.now())
                 .build();
     }
 
@@ -35,7 +38,7 @@ public class PostMapper {
                 .authorId(post.getAuthor().getId())
                 .description(post.getDescription())
                 .postDate(post.getPostDate())
-                .comments(post.getComments())
+                .comments(commentRepository.findByPostId(post.getId()))
                 .build();
     }
 }

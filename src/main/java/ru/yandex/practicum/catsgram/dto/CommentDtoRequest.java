@@ -21,8 +21,4 @@ public class CommentDtoRequest {
     @NotBlank(groups = {OnCreate.class})
     @NotNull(groups = {OnCreate.class})
     String description;
-    @PositiveOrZero(groups = {OnCreate.class, OnUpdate.class})
-    long likesCount;
-    @PastOrPresent(groups = {OnCreate.class, OnUpdate.class})
-    LocalDate date;
 }

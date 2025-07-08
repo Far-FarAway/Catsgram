@@ -51,7 +51,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public Collection<Comment> getComments(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+    public Collection<CommentDtoResponse> getComments(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
                                            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate until,
                                            @PathVariable long postId) {
         return postService.getComments(from, until, postId);

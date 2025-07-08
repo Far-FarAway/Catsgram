@@ -3,12 +3,14 @@ package ru.yandex.practicum.catsgram.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.catsgram.marker.OnCreate;
 import ru.yandex.practicum.catsgram.marker.OnUpdate;
 
 @Data
-public class NewUserRequest {
+@Builder
+public class UserDtoRequest {
     @NotNull(groups = {OnCreate.class})
     @NotBlank(groups = {OnCreate.class})
     private String username;
@@ -17,4 +19,16 @@ public class NewUserRequest {
     @NotBlank(groups = {OnCreate.class})
     @NotNull(groups = {OnCreate.class})
     private String password;
+
+    public boolean hasEmail() {
+        return email != null;
+    }
+
+    public boolean hasUsername() {
+        return username != null;
+    }
+
+    public boolean hasPassword() {
+        return password != null;
+    }
 }

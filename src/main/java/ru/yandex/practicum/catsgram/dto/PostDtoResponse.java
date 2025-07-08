@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.catsgram.model.Comment;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,5 +16,5 @@ public class PostDtoResponse {
     Long authorId;
     String description;
     LocalDate postDate;
-    Map<Long, Comment> comments;
+    List<Comment> comments;
 }

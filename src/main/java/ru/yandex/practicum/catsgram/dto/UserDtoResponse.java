@@ -12,7 +12,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserDtoResponse {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id;
     private String username;

@@ -23,7 +23,4 @@ public class PostDtoRequest {
     @NotNull(groups = {OnCreate.class})
     @NotBlank(groups = {OnCreate.class})
     String description;
-    @FutureOrPresent(groups = {OnCreate.class, OnUpdate.class})
-    LocalDate postDate;
-    Map<Long, Comment> comments;
 }

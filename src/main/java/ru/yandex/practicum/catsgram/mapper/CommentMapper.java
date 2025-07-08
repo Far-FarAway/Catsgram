@@ -11,6 +11,8 @@ import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Comment;
 import ru.yandex.practicum.catsgram.model.Post;
 
+import java.time.LocalDate;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -25,8 +27,7 @@ public class CommentMapper {
                 .id(dto.getId())
                 .post(post)
                 .description(dto.getDescription())
-                .likesCount(dto.getLikesCount())
-                .date(dto.getDate())
+                .date(LocalDate.now())
                 .build();
 
     }

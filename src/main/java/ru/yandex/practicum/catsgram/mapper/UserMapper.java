@@ -4,9 +4,8 @@ package ru.yandex.practicum.catsgram.mapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.catsgram.dto.NewUserRequest;
-import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
-import ru.yandex.practicum.catsgram.dto.UserDto;
+import ru.yandex.practicum.catsgram.dto.UserDtoRequest;
+import ru.yandex.practicum.catsgram.dto.UserDtoResponse;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
@@ -14,7 +13,7 @@ import java.time.Instant;
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserMapper {
-    public static User mapToUser(NewUserRequest request) {
+    public static User mapToUser(UserDtoRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
@@ -24,8 +23,8 @@ public final class UserMapper {
         return user;
     }
 
-    public static UserDto mapToUserDto(User user) {
-        UserDto dto = new UserDto();
+    public static UserDtoResponse mapToUserDto(User user) {
+        UserDtoResponse dto = new UserDtoResponse();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
@@ -33,7 +32,7 @@ public final class UserMapper {
         return dto;
     }
 
-    public static User updateUserFields(User user, UpdateUserRequest request) {
+    public static User updateUserFields(User user, UserDtoRequest request) {
         if (request.hasEmail()) {
             user.setEmail(request.getEmail());
         }

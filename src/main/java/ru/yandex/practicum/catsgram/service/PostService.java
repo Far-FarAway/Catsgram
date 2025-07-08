@@ -27,7 +27,6 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService {
     PostRepository postRepository;
-    UserService userService;
     UserRepository userRepository;
     CommentRepository commentRepository;
     PostMapper postMapper;
@@ -55,7 +54,6 @@ public class PostService {
         Post post = postMapper.mapPojo(dto);
 
         post.setPostDate(LocalDate.now());
-        post.setComments(new HashMap<>());
         return postMapper.mapDto(postRepository.save(post));
     }
 
@@ -70,7 +68,7 @@ public class PostService {
             oldPost.setDescription(newPost.getDescription());
         }
 
-        return postMapper.mapDto(oldPost);
+        return postMapper.mapDto(postRepository.save(oldPost));
     }
 
     public PostDtoResponse getPostById(long id) {
@@ -78,22 +76,29 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("Пост с id = " + id + " не найден")));
     }
 
-    public Collection<Comment> getComments(LocalDate from, LocalDate until, long postId) {
+    public Collection<CommentDtoResponse> getComments(LocalDate from, LocalDate until, long postId) {
+        List<Comment> comments;
+
         if (from == null && until != null) {
-            return commentRepository.findAllByFilterUntil(until);
+            comments = commentRepository.findAllByFilterUntil(until);
         } else if (from != null && until == null) {
-            return commentRepository.findAllByFilterFrom(from);
+            comments = commentRepository.findAllByFilterFrom(from);
         } else if (from != null) {
-            return commentRepository.findAllByFilters(from, until);
+            comments = commentRepository.findAllByFilters(from, until);
         } else {
-            return commentRepository.findAll();
+            comments = commentRepository.findAll();
         }
+
+        return comments.stream()
+                .map(commentMapper::mapDto)
+                .toList();
     }
 
     public CommentDtoResponse createComment(long postId, CommentDtoRequest dto) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Пост с id = " + postId + " не найден"));
 
+        dto.setPostId(postId);
         Comment comment = commentMapper.mapPojo(dto);
 
         comment.setPost(post);

@@ -29,7 +29,4 @@ public class Post {
     String description;
     @Column(name = "post_date")
     LocalDate postDate;
-    @OneToMany(mappedBy = "post")
-    @MapKey(name = "id")
-    Map<Long, Comment> comments;
 }
